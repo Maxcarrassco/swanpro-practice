@@ -12,13 +12,13 @@ from api.v1.auth.jwt_auth import auth
 grade_router = Blueprint("grade_router", __name__, url_prefix="/api/v1/grades")
 
 
-@grade_router.get("/")
+@grade_router.get("/<user_id>")
 @auth.login_required()
-def get_grades():
+def get_grades(user_id: str):
     current_user: User = auth.current_user()
     if current_user.id != id and current_user.role != "teacher":
         return abort(401, "Not authorized to view this resource")
-    user = storage.get_obj_by_id(User, current_user.id)
+    user = storage.get_obj_by_id(User, user_id)
     if not user:
         return jsonify(404, {"msg": "user not Found"})
     return [v.to_dict() for v in user.grades]
@@ -45,14 +45,14 @@ def record_grade(body: RecordGradeSchema):
     return jsonify(201, {"msg": "Grade recorded Successfully!"})
 
 
-@grade_router.post("/avgs")
+@grade_router.get("/avgs/<user_id>")
 @auth.login_required
 @validate()
-def get_all_sub_avg_grade(body: GradeSchema):
+def get_all_sub_avg_grade(user_id: str):
     current_user: User = auth.current_user()
     if current_user.id != id and current_user.role != "teacher":
         return abort(401, "Not authorized to view this resource")
-    user = storage.get_obj_by_id(User, body.user_id)
+    user = storage.get_obj_by_id(User, user_id)
     if not user:
         return jsonify(404, {"msg": "user not Found"})
     if user.role != "student":
