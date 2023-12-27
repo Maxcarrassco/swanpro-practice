@@ -1,0 +1,3 @@
+CREATE DATABASE IF NOT EXISTS swanprodb;
+CREATE USER IF NOT EXISTS swanprodev IDENTIFIED BY 'swanprodev231';
+GRANT ALL PRIVILEGES ON swanprodb.* TO swanprodev;

@@ -1,0 +1,3 @@
+#!/usr/bin/bash
+
+cat sql/resetDb.sql | mysql -v

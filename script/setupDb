@@ -1,0 +1,3 @@
+#!/usr/bin/bash
+
+cat sql/setupDb.sql | mysql -v

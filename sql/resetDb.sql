@@ -1,0 +1,2 @@
+DROP DATABASE IF EXISTS maxpaytrust;
+DROP USER IF EXISTS maxpaydev;
