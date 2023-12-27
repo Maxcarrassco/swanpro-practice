@@ -36,6 +36,6 @@ DB_URL=postgres://{YOUR_DB_USER_NAME}:{YOUR_DB_PASSWORD}@{HOST}:{PORT}/{DBNAME} 
 ```
 ### Command to start the API Server
 ```bash
-# inside the backend directory
+# from the root of the project
 python3 -m api.v1.app
 ```
