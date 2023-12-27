@@ -27,6 +27,9 @@ pip install -r requirement.txt
 # from the root of the project
 touch .env
 # inside .env file
+JWT_SECRET=your-jwt-secret-key # openssl rand -hex 32 to generate a strong secret
+JWT_TIME_TO_LIVE=user-access-token-expiring-time(in minute)
+JWT_ALGORITHM=your-jwt-algorithm
 DB_URL=mysql://{YOUR_DB_USER_NAME}:{YOUR_DB_PASSWORD}@{HOST}:{PORT}/{DBNAME} # ensure to create a database
              OR
 DB_URL=postgres://{YOUR_DB_USER_NAME}:{YOUR_DB_PASSWORD}@{HOST}:{PORT}/{DBNAME} # ensure to create a database
