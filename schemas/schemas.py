@@ -8,10 +8,15 @@ class Gender(Enum):
     OTHER = "other"
 
 
+class Role(Enum):
+    TEACHER = "teacher"
+    STUDENT = "student"
+
+
 class CreateUserSchema(BaseModel):
     name: str
     age: int
-    role: str
+    role: Role
     gender: Gender
     password: str
     email: EmailStr
@@ -26,6 +31,10 @@ class UpdateUserSchema(BaseModel):
 class LoginSchema(BaseModel):
     email: EmailStr
     password: str
+
+
+class LogoutSchema(BaseModel):
+    token: str
 
 
 class ClassSchema(BaseModel):

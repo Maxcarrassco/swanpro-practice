@@ -10,6 +10,7 @@ from models.users import User
 from models.subject import Subject
 from models.s_class import Class
 from models.grade import Grade
+from models.blocklisted_token import BlockListedToken
 from models.base_model import BaseModel
 
 load_dotenv()
@@ -77,6 +78,14 @@ class DBStorage:
             return None
         result = self.__session.query(User).where(User.email == email).first()
         return result
+
+    def get_blocklisted_token_by_token(self, token: str) -> Union[str, None]:
+        """Get a BlockListedToken by token: return None if the BlockListedToken is not found"""
+        if not self.__session:
+            return None
+        result = self.__session.query(BlockListedToken).where(BlockListedToken.token == token).first()
+        return result
+
 
     def get_user_avg_grade(self, user_id: str):
         if not self.__session:

@@ -35,6 +35,8 @@ def decode_access_token(token: str) -> Dict:
 @auth.verify_token
 def verify_token(token):
     """Return login user."""
+    if storage.get_blocklisted_token_by_token(token):
+        return abort(401, 'Could not validate credentials')
     data = decode_access_token(token)
     user = storage.get_obj_by_id(User, data["id"])
     if not user:

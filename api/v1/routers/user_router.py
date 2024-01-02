@@ -4,7 +4,6 @@ from flask import Blueprint, abort, jsonify
 from flask_pydantic import validate
 from models import storage
 from models.users import User
-from models.subject import Subject
 from schemas.schemas import CreateUserSchema
 from schemas.schemas import UpdateUserSchema
 from api.v1.auth.jwt_auth import auth
@@ -26,10 +25,12 @@ def get_users():
 @user_router.post("/")
 @validate()
 def create_user(body: CreateUserSchema):
+    if storage.get_user_by_email(body.email):
+        return {"msg": "user already exist"}, 400
     try:
         user = User(**(body.__dict__))
         user.gender = user.gender.value
-        user.role = user.role.lower()
+        user.role = user.role.value.lower()
         user.password = hash_password(user.password)
         storage.save()
     except Exception:
