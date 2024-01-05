@@ -25,12 +25,18 @@ def get_classes():
 @auth.login_required(role="teacher")
 @validate()
 def create_classe(body: ClassSchema):
+    classe = storage.get_object_by_label(Class, body.label)
+    if classe:
+        if classe.deleted:
+            return jsonify(400, {"msg":"this class was deleted recently; unable to create this class again till after 3 months"})
+        return jsonify(400, {"msg":"class already exists"})
     try:
-        Class(**(body.__dict__))
+        classe = Class(**(body.__dict__))
         storage.save()
-    except Exception:
+    except Exception as e:
+        print(e)
         return abort(500, "Oops! Something went wrong! We are working on it!")
-    return jsonify(201, {"msg": "Class Successfully created!"})
+    return classe.to_dict()
 
 
 @class_router.get("/<id>")
@@ -40,7 +46,7 @@ def get_classe(id: str):
         classe = storage.get_obj_by_id(Class, id)
     except Exception:
         return abort(500, "Oops! Something went wrong! We are working on it!")
-    if not classe:
+    if not classe or classe.deleted:
         return jsonify(404, {"msg": "Class not Found"})
     return classe.to_dict()
 
@@ -50,7 +56,7 @@ def get_classe(id: str):
 @validate()
 def update_classe(id: str, body: ClassSchema):
     classe = storage.get_obj_by_id(Class, id)
-    if not classe:
+    if not classe or classe.deleted:
         return jsonify(404, {"msg": "Class not Found"})
     classe.label = body.label
     try:
@@ -65,7 +71,7 @@ def update_classe(id: str, body: ClassSchema):
 @auth.login_required(role="teacher")
 def delete_classe(id: str):
     classe = storage.get_obj_by_id(Class, id)
-    if not classe:
+    if not classe or classe.deleted:
         return jsonify(404, {"msg": "Class not Found"})
     try:
         storage.delete(classe)

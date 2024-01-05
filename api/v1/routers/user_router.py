@@ -9,6 +9,7 @@ from schemas.schemas import UpdateUserSchema
 from api.v1.auth.jwt_auth import auth
 from utils.password_utils import hash_password
 
+
 user_router = Blueprint("user_router", __name__, url_prefix="/api/v1/users")
 
 
@@ -25,7 +26,10 @@ def get_users():
 @user_router.post("/")
 @validate()
 def create_user(body: CreateUserSchema):
-    if storage.get_user_by_email(body.email):
+    user = storage.get_user_by_email(body.email)
+    if user:
+        if user.deleted:
+            return jsonify(400, {"msg":"this user was deleted recently; unable to create this user again till after 3 months"})
         return {"msg": "user already exist"}, 400
     try:
         user = User(**(body.__dict__))
@@ -44,7 +48,7 @@ def get_user(id: str):
         user = storage.get_obj_by_id(User, id)
     except Exception:
         return abort(500, "Oops! Something went wrong! We are working on it!")
-    if not user:
+    if not user or user.deleted:
         return jsonify(404, {"msg": "user not Found"})
     return user.to_dict()
 
@@ -54,7 +58,7 @@ def get_user(id: str):
 @validate()
 def update_user(id: str, body: UpdateUserSchema):
     user = storage.get_obj_by_id(User, id)
-    if not user:
+    if not user or user.deleted:
         return jsonify(404, {"msg": "user not Found"})
     user.gender = body.gender.value
     user.name = body.name
@@ -74,11 +78,12 @@ def delete_user(id: str):
     if current_user.id != id and current_user.role != "teacher":
         return abort(401, "Not authorized to view this resource")
     user = storage.get_obj_by_id(User, id)
-    if not user:
+    if not user or user.deleted:
         return jsonify(404, {"msg": "user not Found"})
     try:
         storage.delete(user)
         storage.save()
-    except Exception:
+    except Exception as e:
+        print(e)
         return abort(500, "Oops! Something went wrong! We are working on it!")
     return user.to_dict()

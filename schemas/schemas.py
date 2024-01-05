@@ -42,15 +42,19 @@ class ClassSchema(BaseModel):
 
 
 class SubjectSchema(BaseModel):
+    class_name: str
+    label: str
+
+class SubjectUpdateSchema(BaseModel):
     label: str
 
 
 class RecordGradeSchema(BaseModel):
     user_id: str
     grade: int
-    subject_id: str
+    subject: str
 
 
 class GradeSchema(BaseModel):
     user_id: str
-    subject_id: str
+    subject: str

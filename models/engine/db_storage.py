@@ -54,13 +54,13 @@ class DBStorage:
             return objs
         if not ob:
             for model in [Class, User, Subject]:
-                result = self.__session.query(model).offset(
+                result = self.__session.query(model).where(model.deleted == False).offset(
                     offset).limit(limit).all()
                 for obj in result:
                     key = f"{type(obj).__name__}.{obj.id}"
                     objs[key] = obj
             return objs
-        result = self.__session.query(ob).offset(offset).limit(limit).all()
+        result = self.__session.query(ob).where(ob.deleted == False).offset(offset).limit(limit).all()
         for obj in result:
             key = f"{type(obj).__name__}.{obj.id}"
             objs[key] = obj
@@ -69,14 +69,21 @@ class DBStorage:
     def get_obj_by_id(self, ob: BaseModel, id: str) -> Union[BaseModel, None]:
         if not self.__session:
             return None
-        result = self.__session.query(ob).where(ob.id == id).first()
+        result = self.__session.query(ob).where(ob.id == id and ob.deleted == False).first()
         return result
 
     def get_user_by_email(self, email: str) -> Union[User, None]:
         """Get a user by email: return None if the user is not found"""
         if not self.__session:
             return None
-        result = self.__session.query(User).where(User.email == email).first()
+        result = self.__session.query(User).where(User.email == email and User.deleted == False).first()
+        return result
+    
+    def get_object_by_label(self, ob: Union[Subject, Class], label: str) -> Union[Class, Union[Subject, None]]:
+        """Get a user by email: return None if the user is not found"""
+        if not self.__session:
+            return None
+        result = self.__session.query(ob).where(ob.label == label and ob.deleted == False).first()
         return result
 
     def get_blocklisted_token_by_token(self, token: str) -> Union[str, None]:
@@ -105,7 +112,8 @@ class DBStorage:
         """Delete the object passed from db session"""
         if not self.__session:
             return
-        self.__session.delete(ob)
+        model = type(ob)
+        self.__session.query(model).where(model.id == ob.id).update({"deleted": True})
 
     def update(self, ob: BaseModel, id: int) -> None:
         """Update the object passed in db session"""
@@ -113,4 +121,4 @@ class DBStorage:
             return
         cls = type(ob)
         ob.updated_at = datetime.utcnow()
-        self.__session.query(cls).where(cls.id == id).update(ob.to_dict())
+        self.__session.query(cls).where(cls.id == id and cls.deleted == False).update(ob.to_dict())

@@ -29,6 +29,7 @@ touch .env
 # inside .env file
 JWT_SECRET=your-jwt-secret-key # openssl rand -hex 32 to generate a strong secret
 JWT_TIME_TO_LIVE=user-access-token-expiring-time(in minute)
+STUDENT_DEFAULT_PASSWORD=DEFAULT_PASSWORD_FOR_NEW_STUDENT_THAT_WILL_BE_CREATED_WHEN_READING_GRADES_FROM_EXCEL
 JWT_ALGORITHM=your-jwt-algorithm
 DB_URL=mysql://{YOUR_DB_USER_NAME}:{YOUR_DB_PASSWORD}@{HOST}:{PORT}/{DBNAME} # ensure to create a database
              OR

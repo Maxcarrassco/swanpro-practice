@@ -9,6 +9,7 @@ from uuid import uuid4
 
 class BaseModel(DeclarativeBase):
     id: Mapped[str] = mapped_column(String(80), primary_key=True)
+    deleted: Mapped[bool] = mapped_column(default=False)
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(onupdate=func.now())
 
@@ -38,6 +39,7 @@ class BaseModel(DeclarativeBase):
     def to_dict(self):
         data = self.__dict__.copy()
         del data["_sa_instance_state"]
+        del data["deleted"]
         if data.get("created_at") and isinstance(data.get("created_at"), datetime):
             data["created_at"] = data["created_at"].isoformat()
         if data.get("updated_at") and isinstance(data.get("updated_at"), datetime):
